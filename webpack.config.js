@@ -53,16 +53,8 @@ module.exports = [
       maxEntrypointSize: (2 * 1048576),
     },
     plugins: [
-      new CleanWebpackPlugin({
-        // We use the HtmlWebpackInlineSourcePlugin to bundle the whole app
-        // into the viciious.html file, but webpack will have also emitted the
-        // separate JavaScript and CSS files. Delete them.
-        protectWebpackAssets: false,
-        cleanAfterEveryBuildPatterns: ["main.js", "main.css"],
-      }),
       new HtmlWebpackPlugin({
         title:        "Viciious",
-        inlineSource: "\\.(js|css)$",
         template:     "src/host/webFrontEnd/template.ejs",
         filename:     "viciious.html",
       }),
