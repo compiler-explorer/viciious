@@ -10,22 +10,7 @@ let c64;
 export function initLoaderDialog(nascentC64) {
   c64 = nascentC64;
 
-  document
-    .getElementById("hoverBovverButton")
-    .addEventListener(
-      "click",
-      // TODO: reassign joystick to port 1 automatically
-      () => launch("Hover Bovver.prg", hoverBovverPrg)
-    )
-  ;
 
-  document
-    .getElementById("firstButton")
-    .addEventListener(
-      "click",
-      () => launch("First.prg", firstPrg)
-    )
-  ;
 }
 
 function launch(filename, bytes) {
