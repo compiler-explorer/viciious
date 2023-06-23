@@ -14,6 +14,8 @@ import { initJoystickDialog } from "./joystickDialog";
 import { initKeyMapDialog }   from "./keyMapDialog";
 import { initLoaderDialog }   from "./loaderDialog";
 import { initDiskDialog }     from "./diskDialog";
+import { ingest } from "../ingest";
+import { base64Decode } from "../../tools/base64";
 
 // A development aid. Don't commit with this turned on.
 const pauseOnMenus = false;
@@ -60,6 +62,19 @@ export function attach(nascentC64) {
 
   c64.hooks.reportError = showErrorDialog;
   c64.hooks.setTitle = setTitle;
+
+  const parsedQuery = parseQuery();
+  if (parsedQuery['b64c64']) {
+    console.log('waiting until ready...');
+    const startupLoop = setInterval(() => {
+      const regs = c64.cpu.getState();
+      if (regs.a === 0 && regs.x === 0 && regs.y === 10 && regs.s === 243) {
+        clearInterval(startupLoop);
+        console.log('ready! - loading file');
+        ingest(c64, parsedQuery['filename'], base64Decode(parsedQuery['b64c64']));
+      }
+    }, 500);
+  }
 }
 
 const initialTitle = document.title;
@@ -69,4 +84,21 @@ function setTitle(str) {
   // And get it into the snapshot name; at least so that clicking on the
   // snapshot will restore the window title.
   document.title = str.length ? `${str} (${initialTitle})` : initialTitle;
+}
+
+function parseQuery() {
+  const parsedQuery = {};
+
+  let queryString = document.location.search.substring(1) + "&" + window.location.hash.substring(1);
+
+  queryString.split("&").forEach(function (keyval) {
+      const keyAndVal = keyval.split("=");
+      const key = decodeURIComponent(keyAndVal[0]);
+
+      let val = null;
+      if (keyAndVal.length > 1) val = decodeURIComponent(keyAndVal[1]);
+      parsedQuery[key] = val;
+  });
+
+  return parsedQuery;
 }
