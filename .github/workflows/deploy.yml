@@ -1,0 +1,28 @@
+name: Deploy
+
+on: workflow_dispatch
+
+jobs:
+  build_and_upload:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+      - name: Npm things
+        run: npm i
+      - name: Build
+        run: npm run build-web-prod
+      - name: Upload to S3
+        uses: prewk/s3-cp-action@v2
+        with:
+          source: ./dist/web-prod
+          dest: s3://ce-cdn.net/viciious
+          flags: --recursive
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
